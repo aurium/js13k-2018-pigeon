@@ -4,29 +4,42 @@
 <title>A-Frame Fractal</title>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
-<script src="https://aframe.io/releases/0.6.1/aframe.min.js"></script>
+<!-- script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script -->
+<script src="aframe-0.8.2.min.js"></script>
 <script src="boid.js"></script>
 <script src="aabb.js"></script>
 <style>
 body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-size:3vw; text-align:center }
+#debugGEl { position:absolute; top:0; bottom:0; left:0; right:0 }
 </style>
 <body>
-<a-scene background="color: #EEE" fog="type: linear; far: 100; color: #6AE">
+<a-scene background="color: #6AE" fog="type: linear; far: 800; color: #6AE">
   <a-assets>
     <canvas id="cSky"></canvas>
   </a-assets>
 
+<!--
   <a-sky id="sky" position="0 0 0" radius="2000" material="fog: false" src="#cSky"></a-sky>
+-->
 
-  <a-camera position="0 4 2" far="2000" look-controls="enabled: false" rotation="0 0 0">
-    <a-plane id="elice" position="0 -.3 -0.4" color="#DDD" rotation="0 0 0" height=".8" width=".08">
-      <a-animation dur="800" repeat="indefinite" easing="linear" loop="true" attribute="rotation" from="0 0 0" to="0 0 360"></a-animation>
-      <a-triangle color="#DDD" opacity="0.5" vertex-a=".04 .4 0" vertex-b=".04 0 0" vertex-c=".2 .35 0"></a-triangle>
-      <a-triangle color="#DDD" opacity="0.5" vertex-a="-.04 0 0" vertex-b="-.2 -.35 0" vertex-c="-.04 -.4 0"></a-triangle>
-    </a-plane>
-    <a-cylinder position="0 -.3 0" radius="0.2" height="0.8" rotation="90 0 0" color="#F80" shadow>
-    </a-cylinder>
+<!--
+  <a-camera id="camDebug" position="0 6 0" far="2000" look-controls="enabled: false" inactive rotation="-90 0 0">
+    <a-cone id="rotatDebug" color="gray" radius-bottom=".2" radius-top="0" height=".8" position="0 -1 -6" rotation="0 0 0"></a-cone>
   </a-camera>
+-->
+  <a-entity id="plane" position="0 40 2" rotation="0 0 0">
+    <a-camera id="cam" far="800" look-controls="enabled: false" active rotation="0 0 0" active="false">
+      <a-plane id="elice" position="0 -.3 -0.4" color="#DDD" rotation="0 0 0" height=".8" width=".08">
+        <a-animation dur="800" repeat="indefinite" easing="linear" loop="true" attribute="rotation" from="0 0 0" to="0 0 360"></a-animation>
+        <a-triangle color="#DDD" opacity="0.5" vertex-a=".04 .4 0" vertex-b=".04 0 0" vertex-c=".2 .35 0"></a-triangle>
+        <a-triangle color="#DDD" opacity="0.5" vertex-a="-.04 0 0" vertex-b="-.2 -.35 0" vertex-c="-.04 -.4 0"></a-triangle>
+      </a-plane>
+      <a-cylinder position="0 -.3 0" radius="0.2" height="0.8" rotation="90 0 0" color="#F80" shadow>
+      </a-cylinder>
+      <a-cone color="red" radius-bottom=".1" radius-top="0" height=".5" position="-.4 -.3 .3" rotation="0 0 90"></a-cone>
+      <a-cone color="blue" radius-bottom=".1" radius-top="0" height=".5" position=".4 -.3 .3" rotation="0 0 -90"></a-cone>
+    </a-camera>
+  </a-entity>
 
   <a-box position="-2 .5 -5" rotation="0 45 0" color="#4CC3D9" shadow></a-box>
 
@@ -34,11 +47,13 @@ body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-siz
 
   <a-cylinder position="0 0.2 -3" radius="0.5" height="0.4" color="#FFC65D" shadow></a-cylinder>
 
-  <a-plane id="ground" class="solid" position="0 0 0" rotation="-90 0 0" width="200" height="200" color="#490" shadow></a-plane>
+  <a-plane id="ground" class="solid" position="0 0 0" rotation="-90 0 0" width="2000" height="2000" color="#490" shadow></a-plane>
 
   <a-sphere id="point" radius=".3" position="0 1 -1" color="#ff0" shadow></a-sphere>
 
 </a-scene>
+
+<canvas id="debugGEl"></canvas>
 
 <script src="game.js"></script>
 </body>
