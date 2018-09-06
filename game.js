@@ -89,26 +89,39 @@ var mkMountain = (x,z,r,h)=> {
   var green = rRnd(7,10).toString(16);
   var color = `#${red}${green}0`;
   mk('sphere', {position:`${x} ${h} ${z}`, radius:r, color});
-  mk('cylinder', {position:`${x} 0 ${z}`, radius:r, height:h*2, color});
+  if (h>0) mk('cylinder', {position:`${x} 0 ${z}`, radius:r, height:h*2, color});
 }
 
 // Limit Mountains
 var totMountains = 33;
 var inc = oneTurn/totMountains;
 for (var i=0; i<oneTurn; i+=inc) {
-  x = Math.sin(i)*900;
-  z = Math.cos(i)*900;
-  mkMountain(x, z, rnd(90,120), rnd(maxPlaneY, maxPlaneY*2));
+  x = Math.sin(i)*1200;
+  z = Math.cos(i)*1200;
+  mkMountain(x, z, rnd(110,140), rnd(maxPlaneY, maxPlaneY*2));
 }
 for (var i=0; i<oneTurn; i+=inc) {
-  x = Math.sin(i+inc/2)*750;
-  z = Math.cos(i+inc/2)*750;
-  mkMountain(x, z, rnd(55,90), rnd(maxPlaneY));
+  x = Math.sin(i+inc/2)*1000;
+  z = Math.cos(i+inc/2)*1000;
+  mkMountain(x, z, rnd(100,150), rnd(-100, maxPlaneY*.8));
 }
 
-ball.addEventListener('hit', function(ev) {
+var rForrest = 900;
+for (x=-rForrest; x<rForrest; x+=20) for (z=-rForrest; z<rForrest; z+=20) {
+  if (Math.random() < .05 && (x**2 + z**2) < rForrest**2) {
+    var red = rRnd(0,1).toString(16);
+    var green = rRnd(6,8).toString(16);
+    var blue = rRnd(0,2).toString(16);
+    var color = `#${red}${green}${blue}`;
+    var h = (Math.random() + 2) * 20;
+    mk('cone', {position:`${x} ${h/2} ${z}`, 'radius-bottom':13, 'radius-top':0, height:h, color});
+    //mk('cylinder', {position:`${x} 0 ${z}`, radius:4, height:10, color:'#830'});
+  }
+}
+
+//ball.addEventListener('hit', function(ev) {
   //console.log('Ball hit '+ ev.detail.el.tagName);
-});
+//});
 
 window.addEventListener("devicemotion", (ev)=>{
   var ag = event.accelerationIncludingGravity;
@@ -152,7 +165,7 @@ setInterval(function(){
   // Move:
   var rotation = new THREE.Euler(way.up * -quarterTurn, planeYaw, 0, 'ZYX');
   //rotatDebug.object3D.rotation.copy(rotation);
-  velocity = (new THREE.Vector3(0,0,.3)).applyEuler(rotation);
+  velocity = (new THREE.Vector3(0,0,.9)).applyEuler(rotation);
   ['x','y','z'].forEach((k)=> plane.object3D.position[k] -= velocity[k] );
   if (plane.object3D.position.y > maxPlaneY) {
     plane.object3D.position.y = 150;
