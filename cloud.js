@@ -12,7 +12,6 @@ AFRAME.registerComponent('cloud', {
     //console.log('init', this);
     this.pos = this.el.object3D.position;
     this.w = parseInt(this.el.getAttribute('width'));
-    console.log(this.data.velocity)
   },
 
   update: function () {

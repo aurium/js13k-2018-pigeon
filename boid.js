@@ -14,9 +14,9 @@ AFRAME.registerComponent('boid', {
     boids.push(this);
     this.pos = this.el.object3D.position;
     this.rotation = this.el.object3D.rotation;
-    this.rotation.order = 'ZXY';
+    this.rotation.order = 'ZYX';
     this.rotation.x = -quarterTurn;
-    this.rotation.y = -quarterTurn;
+    this.rotation.y = quarterTurn/2;
     this.will = this.rotation.clone();
   },
 

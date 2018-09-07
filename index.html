@@ -23,28 +23,33 @@ body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-siz
   <a-sky id="sky" position="0 0 0" radius="2000" material="fog: false" src="#cSky"></a-sky>
 -->
 
-<!--
-  <a-camera id="camDebug" position="0 6 0" far="2000" look-controls="enabled: false" inactive rotation="-90 0 0">
-    <a-cone id="rotatDebug" color="gray" radius-bottom=".2" radius-top="0" height=".8" position="0 -1 -6" rotation="0 0 0"></a-cone>
-  </a-camera>
--->
+  <!--a-camera id="camDebug" position="0 3 560" far="2000" look-controls="enabled: false" nactive rotation="-90 0 0">
+    <a-cone id="rotatDebug" color="gray" radius-bottom=".2" radius-top="0" height=".8" position="0 -2.5 -6" rotation="0 0 0"></a-cone>
+  </a-camera-->
+
   <a-entity id="plane" position="0 80 700" rotation="0 0 0">
-    <a-camera id="cam" far="800" look-controls="enabled: false" active rotation="0 0 0" active="false">
-      <a-plane id="elice" position="0 -.3 -0.4" color="#DDD" rotation="0 0 0" height=".8" width=".08">
+    <a-camera id="cam" far="800" position="0 .3 0" look-controls="enabled: false" active rotation="0 0 0" active="false">
+      <a-plane id="elice" position="0 -.3 -.4" color="#DDD" rotation="0 0 0" height=".8" width=".08">
         <a-animation dur="800" repeat="indefinite" easing="linear" loop="true" attribute="rotation" from="0 0 0" to="0 0 360"></a-animation>
         <a-triangle color="#DDD" opacity="0.5" vertex-a=".04 .4 0" vertex-b=".04 0 0" vertex-c=".2 .35 0"></a-triangle>
         <a-triangle color="#DDD" opacity="0.5" vertex-a="-.04 0 0" vertex-b="-.2 -.35 0" vertex-c="-.04 -.4 0"></a-triangle>
       </a-plane>
-      <a-cylinder id="planeBody"  aabb-collider="objects: .solid;" position="0 -.3 -.2" radius=".2" height=".3" rotation="90 0 0" color="#F80" shadow>
+      <a-cylinder id="planeBody" position="0 -.3 -.2" radius=".2" height=".3" rotation="90 0 0" color="#F80">
+        <a-cylinder id="planeColiderTest" position="0 0 0" radius=".19" height=".3">
+        <a-sphere id="cabin" color="#F80" radius=".18" position="0 .2 0"></a-sphere>
+        <a-cone id="back" color="#F80" radius-bottom=".2" radius-top=".08" height="1"
+                position="0 .65 0" rotation="0 0 0"></a-cone>
+        <a-cone id="wingLeft" color="#F80" radius-bottom=".2" radius-top=".1" height="1"
+                position="-.6 .3 .05" scale=".4 1 1" rotation="90 0 90"></a-cone>
+        <a-cone id="wingRight" color="#F80" radius-bottom=".2" radius-top=".1" height="1"
+                position=".6 .3 .05" scale=".4 1 1" rotation="90 0 -90"></a-cone>
+        <a-cone id="tail" color="#F80" radius-bottom=".15" radius-top=".05" height=".3"
+                position="0 1.06 -.2" scale=".2 1 1" rotation="-70 0 0"></a-cone>
       </a-cylinder>
-      <a-cone color="red" radius-bottom=".1" radius-top="0" height=".5" position="-.4 -.3 .3" rotation="0 0 90"></a-cone>
-      <a-cone color="blue" radius-bottom=".1" radius-top="0" height=".5" position=".4 -.3 .3" rotation="0 0 -90"></a-cone>
     </a-camera>
   </a-entity>
 
-  <a-plane id="ground" class="solid" position="0 0 0" rotation="-90 0 0" width="2000" height="2000" color="#280" shadow></a-plane>
-
-  <a-sphere id="point" radius=".3" position="0 1 -1" color="#ff0" shadow></a-sphere>
+  <a-plane id="ground" class="solid" position="0 0 0" rotation="-90 0 0" width="2000" height="2000" color="#280"></a-plane>
 
 </a-scene>
 
