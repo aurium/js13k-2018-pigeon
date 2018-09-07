@@ -74,6 +74,7 @@ AFRAME.registerComponent('aabb-collider', {
 
       // AABB collision detection
       function intersect (el) {
+        //if (intersect[el.dataset.kind]) return intersect[el.dataset.kind](el);
         var intersected;
         var mesh = el.getObject3D('mesh');
         var elMin;
@@ -92,6 +93,7 @@ AFRAME.registerComponent('aabb-collider', {
         if (!intersected) { return; }
         collisions.push(el);
       }
+      //intersect['tree'] = function intersectCone (el) {  }
 
       function handleHit (hitEl) {
         hitEl.emit('hit');

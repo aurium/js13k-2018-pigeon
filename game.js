@@ -14,7 +14,8 @@ var pitchAxis = new THREE.Vector3(1,0,0);
 var start = Date.now();
 var x,y,z,i;
 var skyColor = '#6AE';
-var maxPlaneY = 150;
+var maxPlaneY = 200;
+var planeSpeed = .9;
 
 /// HELPERS ////////////////////////////////////////////////////////////////////
 
@@ -76,39 +77,59 @@ for (i=4; i<200; i+=2)
   );
 
 // random floating balls
-for (i=0; i<200; i++)
-  mk('sphere', {position:`${rRnd(200)-100} ${rRnd(200)-100} ${rRnd(200)-50}`, radius:4, color:'#080'});
+//for (i=0; i<200; i++)
+//  mk('sphere', {position:`${rRnd(200)-100} ${rRnd(200)-100} ${rRnd(200)-50}`, radius:4, color:'#080'});
 
-// wall
-//for (x=-200; x<200; x+=15)
-//  for (y=-200; y<200; y+=15)
-//    mk('sphere', {position:`${x} ${y} -1000`, radius:4, color:'#F60'});
+// Create Pingeons
+for (i=0; i<60; i++) mk('cone', {
+  position: `${rnd(10)} ${rnd(80,90)} ${rnd(10)+550}`,
+  'radius-bottom': .2,
+  'radius-top': 0,
+  height: .4,
+  color: 'red',
+  boid: true
+});
+
+// Clouds
+//<a-plane id="ground" class="solid" position="0 0 0" rotation="-90 0 0" width="2000" height="2000" color="#280">
+for (i=0; i<8; i++) x=mk('plane', {
+  position: `${rnd(-1500,1500)} ${maxPlaneY + rnd(-50,0)} ${rnd(-1200,1200)}`,
+  width: rnd(400,600),
+  height: rnd(400,600),
+  rotation: '-90 0 0',
+  color: '#FFF',
+  opacity: 0.5,
+  material: 'side: double',
+  shadow: 'receive: false',
+  cloud: {velocity: rnd(.5,2)}
+});
+console.log(x)
 
 var mkMountain = (x,z,r,h)=> {
   var red = rRnd(0,4).toString(16);
   var green = rRnd(7,10).toString(16);
   var color = `#${red}${green}0`;
-  mk('sphere', {position:`${x} ${h} ${z}`, radius:r, color});
-  if (h>0) mk('cylinder', {position:`${x} 0 ${z}`, radius:r, height:h*2, color});
+  mk('sphere', {class:'solid', position:`${x} ${h} ${z}`, radius:r, color});
+  if (h>0) mk('cylinder', {class:'solid', position:`${x} 0 ${z}`, radius:r, height:h*2, color});
 }
 
-// Limit Mountains
+// Border Mountains
 var totMountains = 33;
 var inc = oneTurn/totMountains;
-for (var i=0; i<oneTurn; i+=inc) {
+for (i=0; i<oneTurn; i+=inc) {
   x = Math.sin(i)*1200;
   z = Math.cos(i)*1200;
   mkMountain(x, z, rnd(110,140), rnd(maxPlaneY, maxPlaneY*2));
 }
-for (var i=0; i<oneTurn; i+=inc) {
+for (i=0; i<oneTurn; i+=inc) {
   x = Math.sin(i+inc/2)*1000;
   z = Math.cos(i+inc/2)*1000;
   mkMountain(x, z, rnd(100,150), rnd(-100, maxPlaneY*.8));
 }
 
-var rForrest = 900;
+var rForrest = 850;
 for (x=-rForrest; x<rForrest; x+=20) for (z=-rForrest; z<rForrest; z+=20) {
-  if (Math.random() < .05 && (x**2 + z**2) < rForrest**2) {
+  if (Math.random() < .02 && (x**2 + z**2) < rForrest**2) {
     var red = rRnd(0,1).toString(16);
     var green = rRnd(6,8).toString(16);
     var blue = rRnd(0,2).toString(16);
@@ -118,10 +139,15 @@ for (x=-rForrest; x<rForrest; x+=20) for (z=-rForrest; z<rForrest; z+=20) {
     //mk('cylinder', {position:`${x} 0 ${z}`, radius:4, height:10, color:'#830'});
   }
 }
+setTimeout(()=> planeBody.components["aabb-collider"].update(), 1000);
 
 //ball.addEventListener('hit', function(ev) {
   //console.log('Ball hit '+ ev.detail.el.tagName);
 //});
+
+planeBody.addEventListener('hit', function(ev) {
+  console.log('plane hit', ev.detail) //.el.tagName);
+});
 
 window.addEventListener("devicemotion", (ev)=>{
   var ag = event.accelerationIncludingGravity;
@@ -165,10 +191,10 @@ setInterval(function(){
   // Move:
   var rotation = new THREE.Euler(way.up * -quarterTurn, planeYaw, 0, 'ZYX');
   //rotatDebug.object3D.rotation.copy(rotation);
-  velocity = (new THREE.Vector3(0,0,.9)).applyEuler(rotation);
+  velocity = (new THREE.Vector3(0,0,planeSpeed)).applyEuler(rotation);
   ['x','y','z'].forEach((k)=> plane.object3D.position[k] -= velocity[k] );
   if (plane.object3D.position.y > maxPlaneY) {
-    plane.object3D.position.y = 150;
+    plane.object3D.position.y = maxPlaneY;
     scene.setAttribute('fog', 'color', 'red');
     scene.setAttribute('background', 'color', 'red');
   } else if (plane.object3D.position.y < maxPlaneY-10) {

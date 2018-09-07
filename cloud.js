@@ -2,22 +2,17 @@
 
 "use strict";
 
-var boids = [];
-const quarterTurn = Math.PI/2;
-
-AFRAME.registerComponent('boid', {
-  schema: {},
+AFRAME.registerComponent('cloud', {
+  schema: {
+    velocity: {default: 1}
+  },
 
   init: function () {
     // Do something when component first attached.
     //console.log('init', this);
-    boids.push(this);
     this.pos = this.el.object3D.position;
-    this.rotation = this.el.object3D.rotation;
-    this.rotation.order = 'ZXY';
-    this.rotation.x = -quarterTurn;
-    this.rotation.y = -quarterTurn;
-    this.will = this.rotation.clone();
+    this.w = parseInt(this.el.getAttribute('width'));
+    console.log(this.data.velocity)
   },
 
   update: function () {
@@ -32,9 +27,11 @@ AFRAME.registerComponent('boid', {
 
   tick: function (time, timeDelta) {
     // Do something on every scene tick or frame.
-    var vel = timeDelta/1000;
-    var velVec = (new THREE.Vector3(0,vel,0)).applyEuler(this.rotation);
-    ['x','y','z'].forEach((k)=> this.pos[k] += velVec[k] );
+    this.pos.x += this.data.velocity;
+    if (this.pos.x > 1200+this.w) {
+      this.pos.x = -1200-this.w;
+      this.pos.z = (Math.random() * 2400) - 1200;
+    }
   }
 });
 

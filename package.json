@@ -1,0 +1,30 @@
+{
+  "name": "js13k-2018-pigeon",
+  "version": "0.0.1",
+  "description": "Get the Pigeon",
+  "main": "index.html",
+  "src": "index.html game.js aabb.js boid.js cloud.js",
+  "zip": "/tmp/js13k-aurium-2018-pigeon.zip",
+  "scripts": {
+    "env": "env",
+    "build": "rm $npm_package_zip && zip $npm_package_zip $npm_package_src && ls -l $npm_package_zip"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/aurium/js13k-2018-pigeon.git"
+  },
+  "keywords": [
+    "js13k",
+    "a-frame",
+    "javascript",
+    "game",
+    "plane",
+    "pigeon"
+  ],
+  "author": "Aurélio A. Heckert",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/aurium/js13k-2018-pigeon/issues"
+  },
+  "homepage": "https://github.com/aurium/js13k-2018-pigeon#readme"
+}
