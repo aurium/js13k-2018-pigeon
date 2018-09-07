@@ -29,11 +29,18 @@ function rnd(a, b) {
 
 const rRnd = (a, b)=> Math.round(rnd(a, b));
 
-function mk(type, attrs) {
+function mk(type, attrs, parent) {
   var el = document.createElement('a-'+type);
   for (var att in attrs) el.setAttribute(att, attrs[att]);
-  scene.appendChild(el);
+  if (parent) parent.appendChild(el);
+  else scene.appendChild(el);
   return el;
+}
+HTMLElement.prototype.mk = function (type, attrs) {
+  return mk(type, attrs, this);
+}
+HTMLElement.prototype.selfRemove = function () {
+  this.parentNode.removeChild(this);
 }
 
 function roundDec(n,d) {
@@ -210,49 +217,109 @@ setInterval(function(){
 var explosion1, explosion2, explosionRadius=0.1;
 setTimeout(()=> planeColiderTest.setAttribute('aabb-collider', 'objects', '.solid'), 1000);
 planeColiderTest.addEventListener('hit', function(ev) {
-  console.log('plane hit ' + ev.detail.el.tagName);
+  console.log(`plane hit ${ev.detail.el.tagName} ${ev.detail.el.id}`);
+  //ev.detail.el.setAttribute('color', 'blue');
   planeColiderTest.removeAttribute('aabb-collider')
-  cabin.object3D.position.z = -.11;
-  while (elice.firstChild) elice.removeChild(elice.firstChild);
   var pos = plane.object3D.position;
-  explosion1 = mk('sphere', {position:`${pos.x} ${pos.y} ${pos.z}`, radius:.02, color:'#F00'});
-  explosion2 = mk('sphere', {position:'0 0 0', radius:.01, color:'#F60'});
-  explosion1.appendChild(explosion2);
+  explosion1 = planeBody.mk('sphere', {radius:.02, color:'#F00'});
+  explosion2 = explosion1.mk('sphere', {radius:.01, color:'#F60'});
   plane.dead = true
-  planeSpeed /= 4;
-  setInterval(smoke, 1000);
+  planeSpeed = .08;
+  buildDeadPlane();
+  setTimeout(()=> setInterval(doSmoke, 2000), 4000);
 });
 
+function buildDeadPlane() {
+  while (elice.firstElementChild) elice.firstElementChild.selfRemove();
+  //<a-sphere id="cabin" color="#F80" radius=".18" position="0 .2 0"></a-sphere>
+  planeBody.mk('sphere', {position:'0 .2 -.11', radius:.18, color:'#F60'});
+  //<a-cone id="back" color="#F80" radius-bottom=".2" radius-top=".08" height="1"
+  //        position="0 .65 0" rotation="0 0 0"></a-cone>
+  planeBody.mk('cone', {position:'0 .65 0', 'radius-bottom':.2, 'radius-top':.08, height:1, color:'#F80'});
+  //<a-cone id="wingLeft" color="#F80" radius-bottom=".2" radius-top=".1" height="1"
+  //        position="-.6 .3 .05" scale=".4 1 1" rotation="90 0 90"></a-cone>
+  planeBody.mk('cone', {position:'-.6 .3 .05', scale:'.4 1 1', rotation:'90 0 90',
+               'radius-bottom':.2, 'radius-top':.1, height:1, color:'#F60'});
+  //<a-cone id="wingRight" color="#F80" radius-bottom=".2" radius-top=".1" height="1"
+  //        position=".6 .3 .05" scale=".4 1 1" rotation="90 0 -90"></a-cone>
+  planeBody.mk('cone', {position:'.6 .3 .05', scale:'.4 1 1', rotation:'90 0 -90',
+               'radius-bottom':.2, 'radius-top':.1, height:1, color:'#F60'});
+  //<a-cone id="tail" color="#F80" radius-bottom=".15" radius-top=".05" height=".3"
+  //        position="0 1.06 -.2" scale=".2 1 1" rotation="-70 0 0"></a-cone>
+  planeBody.mk('cone', {position:'0 1.06 -.2', scale:'.2 1 1', rotation:'-70 0 0',
+               'radius-bottom':.15, 'radius-top':.05, height:.3, color:'#F60'});
+}
+
 function showDeath() {
-  planeSpeed *= 0.99;
+  planeSpeed *= 0.95;
   if (planeSpeed<0.001) planeSpeed = 0;
   explosionRadius += 0.008;
-  explosion1.setAttribute('radius', explosionRadius*1.1);
-  explosion1.setAttribute('opacity', 1 - explosionRadius*.8);
-  explosion2.setAttribute('radius', explosionRadius*0.8);
-  explosion2.setAttribute('opacity', 1 - explosionRadius*.5);
+  if (explosionRadius<3) {
+    if (explosionRadius<2) {
+      explosion1.setAttribute('radius', explosionRadius*1.1);
+      explosion1.setAttribute('opacity', 1 - explosionRadius*.8);
+      explosion2.setAttribute('radius', explosionRadius*0.8);
+      explosion2.setAttribute('opacity', 1 - explosionRadius*.5);
+    } else {
+      console.log('Remove explosion');
+      explosionRadius = 3;
+      explosion2.selfRemove();
+      explosion1.selfRemove();
+    }
+  }
+  // Turn a little asside:
+  planeBody.object3D.rotation.y += -planeSpeed/5;
+  // Drop if not in thr ground:
+  if (plane.object3D.position.y > 1) plane.object3D.position.y -= 0.5;
+  // Correct Cam Roll:
+  cam.object3D.rotation.z /= 1.01;
+  // Correct plane Pitch:
+  plane.object3D.rotation.x /= 1.01;
+  // Do not let the plane away:
+  if (Math.abs(planeBody.object3D.position.x) > .5) planeBody.object3D.position.x /= 1.1;
+  if (planeBody.object3D.position.z > -1.0) planeBody.object3D.position.z -= 0.01;
+  if (planeBody.object3D.position.y > -0.4) planeBody.object3D.position.y -= 0.01;
+  // Adjust view:
+  if (moveRotation.x < -quarterTurn/2) {
+    var div = 1.1 + (quarterTurn + moveRotation.x);
+    cam.object3D.position.y -= planeSpeed/div;
+    elice.object3D.position.y += planeSpeed/div;
+    planeBody.object3D.position.y += planeSpeed/div;
+  }
+  if (moveRotation.x > -0.1) {
+    cam.object3D.position.y += planeSpeed/14;
+    elice.object3D.position.y -= planeSpeed/14;
+    planeBody.object3D.position.y -= planeSpeed/14;
+  }
+  // Move away from colision point:
   velocity = (new THREE.Vector3(0,0,planeSpeed)).applyEuler(moveRotation);
-  cam.object3D.position.y -= planeSpeed/14;
-  elice.object3D.position.y += planeSpeed/14;
-  planeBody.object3D.position.y += planeSpeed/14;
   ['x','y','z'].forEach((k)=> {
-    cam.object3D.position[k] += velocity[k];
+    //plane.object3D.position[k] += velocity[k]/2;
+    cam.object3D.position[k] += velocity[k]*2;
     elice.object3D.position[k] -= velocity[k];
     planeBody.object3D.position[k] -= velocity[k];
   });
 }
 
-function smoke() {
+function doSmoke() {
   //<a-torus-knot color="#B84A39" arc="180" p="2" q="7" radius="5" radius-tubular="0.1"></a-torus-knot>
   var pos = plane.object3D.position;
-  window.smoke = mk('torus-knot', {position:'0 0 0', p:.2, q:.4, radius:.3, 'radius-tubular':.03, color:'gray', rotation:'0 0 90'});
-  explosion2.appendChild(window.smoke);
-  moveSmoke(window.smoke, .8);
+  var smoke = mk('torus', {
+    position:`${pos.x} ${pos.y} ${pos.z-.1}`,
+    radius:0, 'radius-tubular':.02, arc:360,
+    color:'gray', rotation:'90 0 0'
+  });
+  smoke.radius = 0.05;
+  moveSmoke(smoke, .8);
 }
 function moveSmoke(smoke, opacity) {
-  smoke.object3D.position.y += 0.01;
+  smoke.object3D.position.y += 0.009;
+  smoke.radius *= 1.017;
+  smoke.setAttribute('radius', smoke.radius);
+  smoke.setAttribute('radius-tubular', smoke.radius/8);
   smoke.setAttribute('opacity', opacity);
-  if (opacity>0) setTimeout(()=> moveSmoke(smoke, opacity-0.01), 100);
+  if (opacity>0) setTimeout(()=> moveSmoke(smoke, opacity-0.005), 50);
+  else smoke.selfRemove();
 }
 
 var w,h,dbgCtx = debugGEl.getContext('2d');
