@@ -15,7 +15,7 @@ var start = Date.now();
 var x,y,z,i;
 var skyColor = '#6AE';
 var maxPlaneY = 200;
-var planeSpeed = 0.1;
+var planeSpeed = 1;
 
 /// HELPERS ////////////////////////////////////////////////////////////////////
 
@@ -264,19 +264,19 @@ function getWay() {
   return theWay;
 }
 
-var fps = 30, lastTime = Date.now(), ticCount = 0;
+var fps = 30, lastTime = Date.now(), ticCount = 0, ticsCheckout = 10;
 var planeYaw = 0, moveRotation = new THREE.Euler(0, 0, 0);
 setInterval(function(){
   ticCount++;
-  if (ticCount%20 == 0) {
-    var timeDelta = (Date.now() - lastTime) / 20;
+  if (ticCount%ticsCheckout == 0) {
+    var frameDalay = (Date.now() - lastTime) / ticsCheckout;
     lastTime = Date.now();
-    fps = 1000/timeDelta;
-    console.log('FPS', Math.round(fps*10)/10, 'Meter/frame', planeSpeed);
-    if (!plane.dead) {
-      planeSpeed = ( planeSpeed + (.3*30/fps) ) / 2;
-      if (planeSpeed > 1) planeSpeed = 1;
-    }
+    fps = 1000/frameDalay;
+    if (ticCount%(ticsCheckout*3) == 0) console.log(
+                'FPS', Math.round(fps*10)/10,
+                '\nMeter/frame', planeSpeed,
+                '\nMeter/sec', planeSpeed*fps);
+    if (!plane.dead) planeSpeed = ( planeSpeed*4 + (30/fps) ) / 5;
   }
   if (plane.dead) return showDeath();
   if (g.x < 10) g.x += .2
@@ -316,7 +316,7 @@ if (typeof(camDebug) != 'undefined') {
     ['x','y','z'].forEach((k)=>
       camDbgPos[k] = (camDbgPos[k]*4 + thePingeon.object3D.position[k])/5
     );
-    camDbgPos.y = thePingeon.object3D.position.y + 6;
+    camDbgPos.y = thePingeon.object3D.position.y + 20;
   }, 30);
 }
 
@@ -332,7 +332,7 @@ planeColiderTest.addEventListener('hit', function(ev) {
   plane.dead = true
   planeSpeed = .08;
   buildDeadPlane();
-  setTimeout(()=> setInterval(doSmoke, 2000), 4000);
+  setTimeout(()=> setInterval(doSmoke, 3000), 5000);
 });
 
 function buildDeadPlane() {

@@ -30,10 +30,15 @@ AFRAME.registerComponent('boid', {
     console.log('remove', this)
   },
 
+
   tick: function (time, timeDelta) {
     // Do something on every scene tick or frame.
-    var vel = timeDelta/600;
-    var velVec = (new THREE.Vector3(0,vel,0)).applyEuler(this.rotation);
+    // fps = 1000/timeDelta
+    // speed = 20/fps
+    // speed = 20 / 1000/timeDelta
+    // speed * 1000/timeDelta = 20
+    var speed = 20*timeDelta/1000;
+    var velVec = (new THREE.Vector3(0,speed,0)).applyEuler(this.rotation);
     ['x','y','z'].forEach((k)=> this.pos[k] += velVec[k] );
   }
 });
