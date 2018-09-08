@@ -223,6 +223,41 @@ for (i=0; i<oneTurn; i+=inc) {
   mkMountain(x, z, rnd(100,150), rnd(-100, maxPlaneY*.8));
 }
 
+var forrest = [];
+function mkTree(x, z, h, delay=200) {
+  var tree = mk('cone', {
+    position:`${x} ${-h/2} ${z}`,
+    'radius-bottom':13, 'radius-top':0, height:h,
+    src:'#cTree', repeat:'1 5', color
+  });
+  tree.mk('animation', { // Animate Right Wing
+    dur:delay, easing:'linear',
+    attribute:'position', from:`${x} ${-h/2} ${z}`, to:`${x} ${h/2} ${z}`
+  });
+  tree.x = x;
+  tree.z = z;
+  tree.h = h;
+  forrest.push(tree);
+  return tree;
+}
+function removeTree(tree) {
+  if (!tree) return;
+  var yRotate = rnd(360);
+  tree.mk('animation', { // Animate Right Wing
+    dur:1000, easing:'linear',
+    attribute:'rotation', from:`0 ${yRotate} 0`, to:`0 ${yRotate} 90`
+  });
+  tree.mk('animation', { // Animate Right Wing
+    dur:1000, easing:'linear',
+    attribute:'position', from:`${tree.x} ${tree.h/2} ${tree.z}`, to:`${tree.x} 5 ${tree.z}`
+  });
+  setTimeout(()=> tree.mk('animation', { // Animate Right Wing
+    dur:1500, easing:'linear',
+    attribute:'position', from:`${tree.x} 5 ${tree.z}`, to:`${tree.x} -7 ${tree.z}`
+  }), 1500);
+  setTimeout(()=> tree.selfRemove(), 3000);
+}
+
 var rForrest = 850;
 for (x=-rForrest; x<rForrest; x+=20) for (z=-rForrest; z<rForrest; z+=20) {
   if (Math.random() < .02 && (x**2 + z**2) < rForrest**2) {
@@ -230,16 +265,28 @@ for (x=-rForrest; x<rForrest; x+=20) for (z=-rForrest; z<rForrest; z+=20) {
     var green = rRnd(6,8).toString(16);
     var blue = rRnd(0,2).toString(16);
     var color = `#${red}${green}${blue}`;
-    var h = (Math.random() + 2) * 20;
-    mk('cone', {
-      position:`${x} ${h/2} ${z}`,
-      'radius-bottom':13, 'radius-top':0, height:h,
-      src:'#cTree', repeat:'1 5', color
-    });
-    //mk('cylinder', {position:`${x} 0 ${z}`, radius:4, height:10, color:'#830'});
+    var h = rnd(40, 60);
+    mkTree(x, z, h);
   }
 }
-//setTimeout(()=> planeBody.components["aabb-collider"].update(), 1000);
+// Rand initial forrest Array:
+forrest = forrest.sort((a,b)=>rnd(-1,1));
+// controll forrest size by the FPS:
+setInterval(()=> {
+  if (fps < 22 && forrest.length > 80) {
+    console.log('Remove Tree ' + forrest.length);
+    removeTree(forrest.shift());
+  }
+  if (fps > 25 && forrest.length < 700) {
+    console.log('Planting Tree ' + (forrest.length+1));
+    var x = rForrest*2, y = rForrest*2;
+    while ((x**2 + z**2) > rForrest**2) { 
+      x = rnd(-rForrest, rForrest);
+      z = rnd(-rForrest, rForrest);
+    }
+    mkTree(x, z, rnd(40, 60), 10000);
+  }
+}, 500);
 
 window.addEventListener("devicemotion", (ev)=>{
   var ag = event.accelerationIncludingGravity;
