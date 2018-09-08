@@ -1,7 +1,8 @@
 <!doctype html>
 <html>
 <head>
-<title>A-Frame Fractal</title>
+<meta charset="utf-8">
+<title>Js13kGames - Get That Pingeon</title>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
 <!-- script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script -->
@@ -27,7 +28,7 @@ body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-siz
   <a-sky id="sky" position="0 0 0" radius="2000" material="fog: false" src="#cSky"></a-sky>
 -->
 
-  <!--a-camera id="camDebug" far="800" look-controls="enabled: false" inactive rotation="-90 0 0">
+  <!--a-camera id="camDebug" far="800" position="0 100 500" look-controls="enabled: false" active rotation="-90 0 0">
   </a-camera-->
 
   <a-entity id="plane" position="0 80 700" rotation="0 0 0">
@@ -53,7 +54,7 @@ body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-siz
   </a-entity>
 
   <a-box id="ground" class="solid"
-         position="0 0 0" rotation="-90 0 0" width="2000" height="2000" deep="2"
+         position="0 0 0" rotation="-90 0 0" width="2400" height="2400" deep="2"
          src="#cGround" repeat="100 100" material="side: double" color="#280">
   </a-box>
 

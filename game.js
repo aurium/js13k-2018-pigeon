@@ -15,7 +15,7 @@ var start = Date.now();
 var x,y,z,i;
 var skyColor = '#6AE';
 var maxPlaneY = 200;
-var planeSpeed = .9;
+var planeSpeed = 0.1;
 
 /// HELPERS ////////////////////////////////////////////////////////////////////
 
@@ -79,8 +79,8 @@ function debugXYZ(desc, obj, d=3) {
 
 // Draw Ground pattern
 (()=> {
-  var w = cGround.width = 64;
-  var h = cGround.height = 64;
+  var w = cGround.width = 128;
+  var h = cGround.height = 128;
   var ctx = cGround.getContext('2d');
   ctx.fillStyle = '#170';
   ctx.fillRect(0,0, w,h);
@@ -132,28 +132,55 @@ for (i=4; i<200; i+=2)
     mk('sphere', {position:`5 1 ${-i}`, color:'#666'})
   );
 
-// random floating balls
-//for (i=0; i<200; i++)
-//  mk('sphere', {position:`${rRnd(200)-100} ${rRnd(200)-100} ${rRnd(200)-50}`, radius:4, color:'#080'});
+function mkPingeon(x, y, z, color='#DDD') {
+  var pingeon = mk('sphere', { // Body
+    position: `${x} ${y} ${z}`,
+    'radius': .3,
+    color: color,
+    boid: ''
+  });
+  pingeon.mk('sphere', { // head
+    position: '0 .3 0',
+    'radius': .18,
+    color: color,
+  });
+  pingeon.mk('cone', { // Bick
+    position: '0 .5 0',
+    'radius-bottom': .1,
+    'radius-top': 0,
+    height: .2,
+    color: '#E80',
+  });
+  pingeon.mk('sphere', { // Left Wing
+    position: '-.3 0 0',
+    scale:'1 1 .3',
+    'radius': .25,
+    color: color,
+  }).mk('animation', { // Animate Left Wing
+    dur:400, repeat:'indefinite', easing:'linear', loop:'true', direction:'alternate',
+    attribute:'rotation', from:'0 -20 0', to:'0 20 0'
+  });
+  pingeon.mk('sphere', { // Right Wing
+    position: '.3 0 0',
+    scale:'1 1 .3',
+    'radius': .25,
+    color: color,
+  }).mk('animation', { // Animate Right Wing
+    dur:400, repeat:'indefinite', easing:'linear', loop:'true', direction:'alternate',
+    attribute:'rotation', from:'0 20 0', to:'0 -20 0'
+  });
+  pingeon.mk('sphere', { // Tail
+    position: '0 -.3 0',
+    scale:'1 1 .3',
+    'radius': .2,
+    color: color,
+  });
+  return pingeon;
+}
 
 // Create Pingeons
-for (i=0; i<60; i++) mk('cone', {
-  position: `${rnd(10)} ${rnd(95,105)} ${rnd(10)+550}`,
-  'radius-bottom': .2,
-  'radius-top': 0,
-  height: .4,
-  color: 'red',
-  boid: ''
-});
-var thePingeon = mk('cone', {
-  id: 'thePingeon',
-  position: `10 100 550`,
-  'radius-bottom': .2,
-  'radius-top': 0,
-  height: .4,
-  color: 'blue',
-  boid: 'main: true'
-});
+for (i=0; i<30; i++) mkPingeon(rnd(10), rnd(95,105), rnd(10)+550);
+var thePingeon = mkPingeon(5, 100, 555, '#D00');
 
 // Clouds
 //<a-plane id="ground" class="solid" position="0 0 0" rotation="-90 0 0" width="2000" height="2000" color="#280">
@@ -237,15 +264,19 @@ function getWay() {
   return theWay;
 }
 
-var lastTime = Date.now();
-var ticCount = 0;
+var fps = 30, lastTime = Date.now(), ticCount = 0;
 var planeYaw = 0, moveRotation = new THREE.Euler(0, 0, 0);
 setInterval(function(){
   ticCount++;
   if (ticCount%20 == 0) {
     var timeDelta = (Date.now() - lastTime) / 20;
     lastTime = Date.now();
-    console.log('FPS', Math.round(10000/timeDelta)/10);
+    fps = 1000/timeDelta;
+    console.log('FPS', Math.round(fps*10)/10, 'Meter/frame', planeSpeed);
+    if (!plane.dead) {
+      planeSpeed = ( planeSpeed + (.3*30/fps) ) / 2;
+      if (planeSpeed > 1) planeSpeed = 1;
+    }
   }
   if (plane.dead) return showDeath();
   if (g.x < 10) g.x += .2
@@ -266,7 +297,7 @@ setInterval(function(){
   velocity = (new THREE.Vector3(0,0,planeSpeed)).applyEuler(moveRotation);
   ['x','y','z'].forEach((k)=> plane.object3D.position[k] -= velocity[k] );
   if (plane.object3D.position.y > maxPlaneY-3) {
-    if (plane.object3D.position.y > maxPlaneY-2) {
+    if (plane.object3D.position.y > maxPlaneY) {
       plane.object3D.position.y = maxPlaneY;
       scene.setAttribute('fog', 'color', 'red');
       scene.setAttribute('background', 'color', 'red');

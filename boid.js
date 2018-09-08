@@ -32,7 +32,7 @@ AFRAME.registerComponent('boid', {
 
   tick: function (time, timeDelta) {
     // Do something on every scene tick or frame.
-    var vel = timeDelta/1000;
+    var vel = timeDelta/600;
     var velVec = (new THREE.Vector3(0,vel,0)).applyEuler(this.rotation);
     ['x','y','z'].forEach((k)=> this.pos[k] += velVec[k] );
   }
