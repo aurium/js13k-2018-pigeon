@@ -17,14 +17,17 @@ body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-siz
 <a-scene background="color: #6AE" fog="type: linear; far: 850; color: #6AE">
   <a-assets>
     <canvas id="cSky"></canvas>
+    <canvas id="cGround"></canvas>
+    <canvas id="cCloud"></canvas>
+    <canvas id="cTree"></canvas>
+    <canvas id="cMountain"></canvas>
   </a-assets>
 
 <!--
   <a-sky id="sky" position="0 0 0" radius="2000" material="fog: false" src="#cSky"></a-sky>
 -->
 
-  <!--a-camera id="camDebug" position="0 3 560" far="2000" look-controls="enabled: false" nactive rotation="-90 0 0">
-    <a-cone id="rotatDebug" color="gray" radius-bottom=".2" radius-top="0" height=".8" position="0 -2.5 -6" rotation="0 0 0"></a-cone>
+  <!--a-camera id="camDebug" far="800" look-controls="enabled: false" inactive rotation="-90 0 0">
   </a-camera-->
 
   <a-entity id="plane" position="0 80 700" rotation="0 0 0">
@@ -49,7 +52,9 @@ body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-siz
     </a-camera>
   </a-entity>
 
-  <a-box id="ground" class="solid" position="0 0 0" rotation="-90 0 0" width="2000" height="2000" deep="2" color="#280">
+  <a-box id="ground" class="solid"
+         position="0 0 0" rotation="-90 0 0" width="2000" height="2000" deep="2"
+         src="#cGround" repeat="100 100" material="side: double" color="#280">
   </a-box>
 
 </a-scene>

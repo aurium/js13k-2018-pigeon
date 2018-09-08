@@ -54,7 +54,8 @@ function debugXYZ(desc, obj, d=3) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//var buildSky = ()=> {
+// Draw Sky pattern
+//(()=> {
 //  var w = cSky.width = 2000;
 //  var h = cSky.height = 1000;
 //  var ctx = cSky.getContext('2d');
@@ -74,8 +75,56 @@ function debugXYZ(desc, obj, d=3) {
 //    }
 //    ctx.fill();
 //  }
-//}
-//buildSky();
+//})();
+
+// Draw Ground pattern
+(()=> {
+  var w = cGround.width = 64;
+  var h = cGround.height = 64;
+  var ctx = cGround.getContext('2d');
+  ctx.fillStyle = '#170';
+  ctx.fillRect(0,0, w,h);
+  ctx.fillStyle = '#280';
+  ctx.fillRect(0,0, w/2,h/2);
+  ctx.fillRect(w/2,h/2, w,h);
+//  for (x=0; x<w; x+=2) for (y=0; y<h; y+=2)
+//    if (Math.random()<.5) ctx.fillRect(x,y, 2,2);
+})();
+
+// Draw Clouds pattern
+(()=> {
+  var w = cCloud.width = 64;
+  var h = cCloud.height = 64;
+  var ctx = cCloud.getContext('2d');
+  ctx.fillStyle = 'rgba(255,255,255,0.1)';
+  ctx.fillRect(0,0, w,h);
+  ctx.fillStyle = '#FFF';
+  ctx.fillRect(0,0, w/2,h/2);
+  ctx.fillRect(w/2,h/2, w,h);
+})();
+
+// Draw Tree pattern
+(()=> {
+  var w = cTree.width = 8;
+  var h = cTree.height = 32;
+  var ctx = cTree.getContext('2d');
+  ctx.fillStyle = '#280';
+  ctx.fillRect(0,0, w,h);
+  ctx.fillStyle = '#170';
+  ctx.fillRect(0,h/2, w,h);
+})();
+
+
+// Draw Mountain pattern
+(()=> {
+  var w = cMountain.width = 8;
+  var h = cMountain.height = 128;
+  var ctx = cMountain.getContext('2d');
+  ctx.fillStyle = '#280';
+  ctx.fillRect(0,0, w,h);
+  ctx.fillStyle = '#170';
+  ctx.fillRect(0,h/2, w,h);
+})();
 
 // Worm
 for (i=4; i<200; i+=2)
@@ -102,21 +151,21 @@ var thePingeon = mk('cone', {
   'radius-bottom': .2,
   'radius-top': 0,
   height: .4,
-  color: 'red',
+  color: 'blue',
   boid: 'main: true'
 });
 
 // Clouds
 //<a-plane id="ground" class="solid" position="0 0 0" rotation="-90 0 0" width="2000" height="2000" color="#280">
 for (i=0; i<8; i++) mk('plane', {
-  position: `${rnd(-1500,1500)} ${maxPlaneY + rnd(-50,0)} ${rnd(-1200,1200)}`,
+  position: `${rnd(-1500,1500)} ${maxPlaneY + rnd(-60,30)} ${rnd(-1200,1200)}`,
   width: rnd(400,600),
   height: rnd(400,600),
   rotation: '-90 0 0',
   color: '#FFF',
   opacity: 0.5,
   material: 'side: double',
-  shadow: 'receive: false',
+  src:'#cCloud', repeat:'15 15',
   cloud: {velocity: rnd(.5,1)}
 });
 
@@ -124,8 +173,13 @@ var mkMountain = (x,z,r,h)=> {
   var red = rRnd(0,4).toString(16);
   var green = rRnd(7,10).toString(16);
   var color = `#${red}${green}0`;
-  mk('sphere', {class:'solid', position:`${x} ${h} ${z}`, radius:r, color});
-  if (h>0) mk('cylinder', {class:'solid', position:`${x} 0 ${z}`, radius:r, height:h*2, color});
+  mk('sphere', {class:'solid', position:`${x} ${h} ${z}`, radius:r,
+    src:'#cMountain', repeat:'1 12', color
+  });
+  if (h>0) mk('cylinder', {
+    class:'solid', position:`${x} ${h-maxPlaneY} ${z}`, radius:r, height:maxPlaneY*2,
+    src:'#cMountain', repeat:'1 12', color
+  });
 }
 
 // Border Mountains
@@ -150,7 +204,11 @@ for (x=-rForrest; x<rForrest; x+=20) for (z=-rForrest; z<rForrest; z+=20) {
     var blue = rRnd(0,2).toString(16);
     var color = `#${red}${green}${blue}`;
     var h = (Math.random() + 2) * 20;
-    mk('cone', {position:`${x} ${h/2} ${z}`, 'radius-bottom':13, 'radius-top':0, height:h, color});
+    mk('cone', {
+      position:`${x} ${h/2} ${z}`,
+      'radius-bottom':13, 'radius-top':0, height:h,
+      src:'#cTree', repeat:'1 5', color
+    });
     //mk('cylinder', {position:`${x} 0 ${z}`, radius:4, height:10, color:'#830'});
   }
 }
@@ -179,8 +237,16 @@ function getWay() {
   return theWay;
 }
 
+var lastTime = Date.now();
+var ticCount = 0;
 var planeYaw = 0, moveRotation = new THREE.Euler(0, 0, 0);
 setInterval(function(){
+  ticCount++;
+  if (ticCount%20 == 0) {
+    var timeDelta = (Date.now() - lastTime) / 20;
+    lastTime = Date.now();
+    console.log('FPS', Math.round(10000/timeDelta)/10);
+  }
   if (plane.dead) return showDeath();
   if (g.x < 10) g.x += .2
   if (keyPressed.ARROWLEFT)  g.y -= .2, g.x /= 1.2;
@@ -197,22 +263,31 @@ setInterval(function(){
   if (sinZ != 0) planeYaw += sinZ/-60;
   // Move:
   moveRotation = new THREE.Euler(way.up * -quarterTurn, planeYaw, 0, 'ZYX');
-  //rotatDebug.object3D.rotation.copy(moveRotation);
   velocity = (new THREE.Vector3(0,0,planeSpeed)).applyEuler(moveRotation);
   ['x','y','z'].forEach((k)=> plane.object3D.position[k] -= velocity[k] );
-  if (plane.object3D.position.y > maxPlaneY) {
-    plane.object3D.position.y = maxPlaneY;
-    scene.setAttribute('fog', 'color', 'red');
-    scene.setAttribute('background', 'color', 'red');
-  } else if (plane.object3D.position.y < maxPlaneY-10) {
-    scene.setAttribute('fog', 'color', skyColor);
-    scene.setAttribute('background', 'color', skyColor);
+  if (plane.object3D.position.y > maxPlaneY-3) {
+    if (plane.object3D.position.y > maxPlaneY-2) {
+      plane.object3D.position.y = maxPlaneY;
+      scene.setAttribute('fog', 'color', 'red');
+      scene.setAttribute('background', 'color', 'red');
+    } else {
+      scene.setAttribute('fog', 'color', skyColor);
+      scene.setAttribute('background', 'color', skyColor);
+    }
   }
-  //camDebug.object3D.position[k] = (camDebug.object3D.position[k]*9 + plane.object3D.position[k])/10;
-  //camDebug.object3D.position.y = plane.object3D.position.y + 6;
 
   debugG();
 } ,30);
+
+if (typeof(camDebug) != 'undefined') {
+  var camDbgPos = camDebug.object3D.position;
+  setInterval(()=> {
+    ['x','y','z'].forEach((k)=>
+      camDbgPos[k] = (camDbgPos[k]*4 + thePingeon.object3D.position[k])/5
+    );
+    camDbgPos.y = thePingeon.object3D.position.y + 6;
+  }, 30);
+}
 
 var explosion1, explosion2, explosionRadius=0.1;
 setTimeout(()=> planeColiderTest.setAttribute('aabb-collider', 'objects', '.solid'), 1000);
