@@ -7,9 +7,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
 <!-- script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script -->
 <script src="aframe-0.8.2.min.js"></script>
-<script src="boid.js"></script>
-<script src="cloud.js"></script>
-<script src="aabb.js"></script>
 <style>
 body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-size:3vw; text-align:center }
 #debugGEl { position:absolute; top:0; bottom:0; left:0; right:0 }
@@ -60,8 +57,12 @@ body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-siz
 
 </a-scene>
 
-<canvas id="debugGEl"></canvas>
+<!--canvas id="debugGEl"></canvas-->
 
+<script src="helpers.js"></script>
+<script src="boid.js"></script>
+<script src="cloud.js"></script>
+<script src="aabb.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

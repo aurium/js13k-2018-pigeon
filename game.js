@@ -2,10 +2,6 @@
 
 "use strict";
 
-const scene = cam.sceneEl; //document.querySelector('a-scene');
-const quarterTurn = Math.PI/2;
-const haltTurn = Math.PI;
-const oneTurn = Math.PI*2;
 var keyPressed = {};
 var g = {x:1, y:0, z:0};
 var velocity = new THREE.Vector3(0,0,.01);
@@ -16,43 +12,6 @@ var x,y,z,i;
 var skyColor = '#6AE';
 var maxPlaneY = 200;
 var planeSpeed = 1;
-
-/// HELPERS ////////////////////////////////////////////////////////////////////
-
-function rnd(a, b) {
-  if (typeof(b) == 'undefined' || b == null) {
-    b = a;
-    a = 0;
-  }
-  return (Math.random() * (b-a)) + a;
-}
-
-const rRnd = (a, b)=> Math.round(rnd(a, b));
-
-function mk(type, attrs, parent) {
-  var el = document.createElement('a-'+type);
-  for (var att in attrs) el.setAttribute(att, attrs[att]);
-  if (parent) parent.appendChild(el);
-  else scene.appendChild(el);
-  return el;
-}
-HTMLElement.prototype.mk = function (type, attrs) {
-  return mk(type, attrs, this);
-}
-HTMLElement.prototype.selfRemove = function () {
-  this.parentNode.removeChild(this);
-}
-
-function roundDec(n,d) {
-  var m = 10**d;
-  return Math.round(n*m)/m;
-}
-
-function debugXYZ(desc, obj, d=3) {
-  console.log(desc+` x:${roundDec(obj.x,d)} y:${roundDec(obj.y,d)} z:${roundDec(obj.z,d)}`)
-}
-
-////////////////////////////////////////////////////////////////////////////////
 
 // Draw Sky pattern
 //(()=> {
@@ -132,55 +91,10 @@ for (i=4; i<200; i+=2)
     mk('sphere', {position:`5 1 ${-i}`, color:'#666'})
   );
 
-function mkPingeon(x, y, z, color='#DDD') {
-  var pingeon = mk('sphere', { // Body
-    position: `${x} ${y} ${z}`,
-    'radius': .3,
-    color: color,
-    boid: ''
-  });
-  pingeon.mk('sphere', { // head
-    position: '0 .3 0',
-    'radius': .18,
-    color: color,
-  });
-  pingeon.mk('cone', { // Bick
-    position: '0 .5 0',
-    'radius-bottom': .1,
-    'radius-top': 0,
-    height: .2,
-    color: '#E80',
-  });
-  pingeon.mk('sphere', { // Left Wing
-    position: '-.3 0 0',
-    scale:'1 1 .3',
-    'radius': .25,
-    color: color,
-  }).mk('animation', { // Animate Left Wing
-    dur:400, repeat:'indefinite', easing:'linear', loop:'true', direction:'alternate',
-    attribute:'rotation', from:'0 -20 0', to:'0 20 0'
-  });
-  pingeon.mk('sphere', { // Right Wing
-    position: '.3 0 0',
-    scale:'1 1 .3',
-    'radius': .25,
-    color: color,
-  }).mk('animation', { // Animate Right Wing
-    dur:400, repeat:'indefinite', easing:'linear', loop:'true', direction:'alternate',
-    attribute:'rotation', from:'0 20 0', to:'0 -20 0'
-  });
-  pingeon.mk('sphere', { // Tail
-    position: '0 -.3 0',
-    scale:'1 1 .3',
-    'radius': .2,
-    color: color,
-  });
-  return pingeon;
-}
-
 // Create Pingeons
 for (i=0; i<30; i++) mkPingeon(rnd(10), rnd(95,105), rnd(10)+550);
 var thePingeon = mkPingeon(5, 100, 555, '#D00');
+thePingeon.id = 'thePingeon';
 
 // Clouds
 //<a-plane id="ground" class="solid" position="0 0 0" rotation="-90 0 0" width="2000" height="2000" color="#280">
@@ -274,13 +188,13 @@ forrest = forrest.sort((a,b)=>rnd(-1,1));
 // controll forrest size by the FPS:
 setInterval(()=> {
   if (fps < 22 && forrest.length > 80) {
-    console.log('Remove Tree ' + forrest.length);
+    //console.log('Remove Tree ' + forrest.length);
     removeTree(forrest.shift());
   }
   if (fps > 25 && forrest.length < 700) {
-    console.log('Planting Tree ' + (forrest.length+1));
+    //console.log('Planting Tree ' + (forrest.length+1));
     var x = rForrest*2, y = rForrest*2;
-    while ((x**2 + z**2) > rForrest**2) { 
+    while ((x**2 + z**2) > rForrest**2) {
       x = rnd(-rForrest, rForrest);
       z = rnd(-rForrest, rForrest);
     }
@@ -311,7 +225,7 @@ function getWay() {
   return theWay;
 }
 
-var fps = 30, lastTime = Date.now(), ticCount = 0, ticsCheckout = 10;
+var lastTime = Date.now(), ticCount = 0, ticsCheckout = 10;
 var planeYaw = 0, moveRotation = new THREE.Euler(0, 0, 0);
 setInterval(function(){
   ticCount++;
@@ -342,7 +256,7 @@ setInterval(function(){
   // Move:
   moveRotation = new THREE.Euler(way.up * -quarterTurn, planeYaw, 0, 'ZYX');
   velocity = (new THREE.Vector3(0,0,planeSpeed)).applyEuler(moveRotation);
-  ['x','y','z'].forEach((k)=> plane.object3D.position[k] -= velocity[k] );
+  xyzDo((k)=> plane.object3D.position[k] -= velocity[k] );
   if (plane.object3D.position.y > maxPlaneY-3) {
     if (plane.object3D.position.y > maxPlaneY) {
       plane.object3D.position.y = maxPlaneY;
@@ -353,14 +267,14 @@ setInterval(function(){
       scene.setAttribute('background', 'color', skyColor);
     }
   }
-
-  debugG();
+  boidTic(ticCount);
+  //debugG();
 } ,30);
 
 if (typeof(camDebug) != 'undefined') {
   var camDbgPos = camDebug.object3D.position;
   setInterval(()=> {
-    ['x','y','z'].forEach((k)=>
+    xyzDo((k)=>
       camDbgPos[k] = (camDbgPos[k]*4 + thePingeon.object3D.position[k])/5
     );
     camDbgPos.y = thePingeon.object3D.position.y + 20;
@@ -446,7 +360,7 @@ function showDeath() {
   }
   // Move away from colision point:
   velocity = (new THREE.Vector3(0,0,planeSpeed)).applyEuler(moveRotation);
-  ['x','y','z'].forEach((k)=> {
+  xyzDo((k)=> {
     //plane.object3D.position[k] += velocity[k]/2;
     cam.object3D.position[k] += velocity[k]*2;
     elice.object3D.position[k] -= velocity[k];
@@ -475,6 +389,7 @@ function moveSmoke(smoke, opacity) {
   else smoke.selfRemove();
 }
 
+/*
 var w,h,dbgCtx = debugGEl.getContext('2d');
 function resizeCanvas() {
   debugGEl.width = w = window.innerWidth;
@@ -499,6 +414,7 @@ function debugG() {
   dbgCtx.stroke();
   dbgCtx.closePath();
 }
+*/
 
 
 function limitRotationVal(rotation) {
