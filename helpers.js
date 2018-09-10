@@ -11,6 +11,10 @@ const deg45 = Math.PI/4;
 const oneTurn = deg360;
 const halfTurn = deg180;
 const quarterTurn = deg90;
+const abs = Math.abs;
+const round = Math.round;
+
+const dbgXYZ = (obj)=> `x:${round(obj.x*10)/10}, y:${round(obj.y*10)/10}, z:${round(obj.z*10)/10}`
 
 const xyzDo = (func)=> ['x','y','z'].forEach((k)=> func(k));
 

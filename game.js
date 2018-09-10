@@ -92,9 +92,10 @@ for (i=4; i<200; i+=2)
   );
 
 // Create Pingeons
-for (i=0; i<30; i++) mkPingeon(rnd(10), rnd(95,105), rnd(10)+550);
-var thePingeon = mkPingeon(5, 100, 555, '#D00');
+for (i=0; i<30; i++) mkPingeon(rnd(10)+200, rnd(95,105), rnd(10)+500);
+var thePingeon = mkPingeon(205, 100, 500, '#D00');
 thePingeon.id = 'thePingeon';
+//window.boidsCenterEl = mk('sphere', {radius:.3, color:'blue'});
 
 // Clouds
 //<a-plane id="ground" class="solid" position="0 0 0" rotation="-90 0 0" width="2000" height="2000" color="#280">
@@ -233,11 +234,11 @@ setInterval(function(){
     var frameDalay = (Date.now() - lastTime) / ticsCheckout;
     lastTime = Date.now();
     fps = 1000/frameDalay;
-    if (ticCount%(ticsCheckout*3) == 0) console.log(
+    if (ticCount%(ticsCheckout*Math.round(fps/2)) == 0) console.log(
                 'FPS', Math.round(fps*10)/10,
                 '\nMeter/frame', planeSpeed,
                 '\nMeter/sec', planeSpeed*fps);
-    if (!plane.dead) planeSpeed = ( planeSpeed*4 + (30/fps) ) / 5;
+    if (!plane.dead) planeSpeed = ( planeSpeed*4 + (10/fps) ) / 5;
   }
   if (plane.dead) return showDeath();
   if (g.x < 10) g.x += .2
@@ -277,7 +278,7 @@ if (typeof(camDebug) != 'undefined') {
     xyzDo((k)=>
       camDbgPos[k] = (camDbgPos[k]*4 + thePingeon.object3D.position[k])/5
     );
-    camDbgPos.y = thePingeon.object3D.position.y + 20;
+    camDbgPos.y = thePingeon.object3D.position.y + 40;
   }, 30);
 }
 
