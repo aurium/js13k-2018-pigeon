@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Get the Pigeon",
   "main": "index.html",
-  "src": "index.html game.js aabb.js boid.js cloud.js drago.js helpers.js",
+  "src": "index.html game.js aabb.js boid.js cloud.js drago.js balloon.js helpers.js",
   "zip": "/tmp/js13k-aurium-2018-pigeon.zip",
   "scripts": {
     "env": "env",

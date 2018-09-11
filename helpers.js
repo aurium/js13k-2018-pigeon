@@ -11,6 +11,8 @@ const deg45 = Math.PI/4;
 const oneTurn = deg360;
 const halfTurn = deg180;
 const quarterTurn = deg90;
+const sin = Math.sin;
+const cos = Math.cos;
 const abs = Math.abs;
 const round = Math.round;
 

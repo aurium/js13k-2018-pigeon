@@ -4,8 +4,6 @@
 var i;
 var color = '#C00';
 const moveRadius = 500;
-const sin = Math.sin;
-const cos = Math.cos;
 var angPos = 0;
 
 // Draw Drago Eye pattern

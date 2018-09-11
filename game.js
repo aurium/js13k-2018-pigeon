@@ -121,13 +121,13 @@ var mkMountain = (x,z,r,h)=> {
 var totMountains = 33;
 var inc = oneTurn/totMountains;
 for (i=0; i<oneTurn; i+=inc) {
-  x = Math.sin(i)*1200;
-  z = Math.cos(i)*1200;
+  x = sin(i)*1200;
+  z = cos(i)*1200;
   mkMountain(x, z, rnd(110,140), rnd(maxPlaneY, maxPlaneY*2));
 }
 for (i=0; i<oneTurn; i+=inc) {
-  x = Math.sin(i+inc/2)*1000;
-  z = Math.cos(i+inc/2)*1000;
+  x = sin(i+inc/2)*1000;
+  z = cos(i+inc/2)*1000;
   mkMountain(x, z, rnd(100,150), rnd(-100, maxPlaneY*.8));
 }
 
@@ -245,7 +245,7 @@ setInterval(function(){
   plane.object3D.rotation.x = way.up * -quarterTurn;
   plane.object3D.rotation.y = planeYaw;
   cam.object3D.rotation.z = way.left * quarterTurn;
-  var sinZ = Math.sin(-cam.object3D.rotation.z);
+  var sinZ = sin(-cam.object3D.rotation.z);
   if (sinZ != 0) planeYaw += sinZ/-60;
   // Move:
   moveRotation = new THREE.Euler(way.up * -quarterTurn, planeYaw, 0, 'ZYX');
@@ -263,6 +263,7 @@ setInterval(function(){
   }
   boidTic(ticCount);
   dragoTic(ticCount);
+  balloonTic(ticCount);
   //debugG();
 } ,30);
 
