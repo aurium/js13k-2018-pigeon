@@ -213,8 +213,8 @@ function getWay() {
   if (g.y > 10) g.y = 10; if (g.y < -10) g.y = -10;
   if (g.z > 10) g.z = 10; if (g.z < -10) g.z = -10;
   var theWay = {
-    up:    g.z/10 * -1,
-    down:  g.z/10,
+    up:    g.z/10,
+    down:  g.z/10 * -1,
     left:  g.y/10 * -1,
     right: g.y/10,
     normal:     g.x/10,
@@ -244,8 +244,8 @@ setInterval(function(){
   if (g.x < 10) g.x += .2
   if (keyPressed.ARROWLEFT)  g.y -= .2, g.x /= 1.2;
   if (keyPressed.ARROWRIGHT) g.y += .2, g.x /= 1.2;
-  if (keyPressed.ARROWUP)    g.z -= .3, g.x /= 1.2;
-  if (keyPressed.ARROWDOWN)  g.z += .3, g.x /= 1.2;
+  if (keyPressed.ARROWUP)    g.z += .3, g.x /= 1.2;
+  if (keyPressed.ARROWDOWN)  g.z -= .3, g.x /= 1.2;
   if (Math.abs(g.y) > 0) g.y -= g.y/100;
   if (Math.abs(g.z) > 0) g.z -= g.z/100;
   var way = getWay();
