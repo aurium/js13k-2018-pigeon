@@ -73,7 +73,6 @@ var planeSpeed = 1;
   ctx.fillRect(0,h/2, w,h);
 })();
 
-
 // Draw Mountain pattern
 (()=> {
   var w = cMountain.width = 8;
@@ -84,12 +83,6 @@ var planeSpeed = 1;
   ctx.fillStyle = '#170';
   ctx.fillRect(0,h/2, w,h);
 })();
-
-// Worm
-for (i=4; i<200; i+=2)
-  ((el)=> setTimeout(()=> el.setAttribute('boid',true), i*150+1000))(
-    mk('sphere', {position:`5 1 ${-i}`, color:'#666'})
-  );
 
 // Create Pingeons
 for (i=0; i<30; i++) mkPingeon(rnd(10)+200, rnd(95,105), rnd(10)+500);
@@ -269,6 +262,7 @@ setInterval(function(){
     }
   }
   boidTic(ticCount);
+  dragoTic(ticCount);
   //debugG();
 } ,30);
 
