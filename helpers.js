@@ -1,9 +1,9 @@
 "use strict";
 
-var fps = 30; // initialization only
-
+var startTime, started = false;
+var maxPlaneY = 200;
+var skyColor = '#6AE';
 const scene = cam.sceneEl; //document.querySelector('a-scene');
-
 const deg360 = Math.PI*2;
 const deg180 = Math.PI;
 const deg90 = Math.PI/2;
@@ -11,6 +11,9 @@ const deg45 = Math.PI/4;
 const oneTurn = deg360;
 const halfTurn = deg180;
 const quarterTurn = deg90;
+var g = {x:1, y:0, z:0};
+var fps = 30; // initialization only
+
 const sin = Math.sin;
 const cos = Math.cos;
 const abs = Math.abs;

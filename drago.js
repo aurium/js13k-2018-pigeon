@@ -30,14 +30,14 @@ var bodyNodes = [];
 
 for (i=0; i<dragoLength/3; i++) {
   bodyNodes.push(dragBody.mk('sphere', {
-    position:`0 0 -${i*1.2}`, radius:1.4, color
+    position:`0 0 -${i*1.2}`, radius:1.4, class:'solid', color
   }));
 }
 var z = (dragoLength/3)*1.2;
 for (i=1; i<=dragoLength*2/3; i++) {
   let r = 1.4 - i*2.8/(dragoLength*1.8);
   bodyNodes.push(dragBody.mk('sphere', {
-    position:`0 0 -${z}`, radius:r, color
+    position:`0 0 -${z}`, radius:r, class:'solid', id:`dTail${i}`, color
   }));
   z += r-.1;
 }

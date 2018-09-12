@@ -171,7 +171,7 @@ window.boidTic = function boidTic(ticCount) {
     }
   }
 
-  var speed = 20/fps;
+  var speed = 7/fps;
   for (var b,i=0; b=boids[i]; i++) {
     xyzDo((k)=> b.rotation[k] = (b.rotation[k]*9 + b.will[k]) / 10 );
     var vecVel = (new THREE.Vector3(0,speed*b.speedMult,0)).applyEuler(b.rotation);

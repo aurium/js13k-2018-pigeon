@@ -32,7 +32,7 @@ body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-siz
   <!--a-camera id="camDrago" far="800" position="10 150 0" look-controls="enabled: false" active rotation="0 90 0">
   </a-camera-->
   <a-entity id="drago" position="0 150 -10" color="#C00">
-    <a-sphere id="dragoHead" position="0 0 1.8" radius="1.8" color="#C00">
+    <a-sphere id="dragoHead" class="solid" position="0 0 1.8" radius="1.8" color="#C00">
       <a-cone position="0 0 1.8" rotation="90 0 0" color="#C00"
         radius-bottom="1.65" radius-top=".6" height="2.2"></a-cone>
       <a-sphere id="eyeLeft" position="1.6 .3 .6" rotation="0 -40 0" radius=".3" src="#cEye" draw-canvas="cEye"></a-sphere>
@@ -68,8 +68,8 @@ body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-siz
     </a-camera>
   </a-entity>
 
-  <a-box id="ground" class="solid"
-         position="0 0 0" rotation="-90 0 0" width="2400" height="2400" deep="2"
+  <a-box id="ground"
+         position="0 -1 0" rotation="-90 0 0" width="2400" height="2400" deep="2"
          src="#cGround" repeat="100 100" material="side: double" color="#280">
   </a-box>
 
@@ -81,8 +81,7 @@ body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-siz
 <script src="boid.js"></script>
 <script src="drago.js"></script>
 <script src="balloon.js"></script>
-<script src="cloud.js"></script>
-<script src="aabb.js"></script>
+<script src="plane.js"></script>
 <script src="game.js"></script>
 </body>
 </html>
