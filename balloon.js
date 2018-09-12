@@ -2,10 +2,10 @@
 
 (()=>{
 
-const moveRadius = 480;
+const moveRadius = 750;
 
 //var bCam = mk('camera', {far:800, position:'0 130 70', rotation:'0 0 0', 'look-controls':'enabled: false', active:true});
-//var bCam = mk('camera', {far:1800, position:'0 800 0', rotation:'-90 0 0', 'look-controls':'enabled: false', active:true});
+//var bCam = mk('camera', {far:2000, position:'0 1200 0', rotation:'-90 0 0', 'look-controls':'enabled: false', active:true});
 
 var balloons = [];
 
@@ -34,9 +34,9 @@ mkBalloon('#06C', '#008', -deg90);
 
 window.balloonTic = function (ticCount) {
   // move it:
-  // angSpeed = .008/fps =~ 3.8m/s in a 480m radius circle path.
+  // angSpeed = .006/fps =~ 4.5m/s in a 750m radius circle path.
   balloons.forEach((b)=> {
-    b.ang += .01/fps;
+    b.ang += .006/fps;
     b.x = cos(b.ang) * moveRadius;
     b.z = sin(b.ang) * moveRadius;
   });

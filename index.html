@@ -31,16 +31,16 @@ body { margin:0; padding:0; font-family:"Liberation Sans", Arial, sans; font-siz
 
   <!--a-camera id="camDrago" far="800" position="10 150 0" look-controls="enabled: false" active rotation="0 90 0">
   </a-camera-->
-  <a-entity id="drago" position="0 150 -10" radius=".5" color="#C00">
-    <a-sphere id="dragoHead" position="0 0 .6" radius=".6" color="#C00">
-      <a-cone position="0 0 .61" rotation="90 0 0" color="#C00"
-        radius-bottom=".56" radius-top=".2" height=".8"></a-cone>
-      <a-sphere id="eyeLeft" position=".55 .1 .2" rotation="0 -40 0" radius=".1" src="#cEye" draw-canvas="cEye"></a-sphere>
-      <a-sphere id="eyeRight" position="-.55 .1 .2" rotation="0 40 180" radius=".1" src="#cEye" draw-canvas="cEye"></a-sphere>
-      <a-cone position=".54 .55 -.4" rotation="-60 -15 0" color="#E80"
-        radius-bottom=".08" radius-top="0" height="1"></a-cone>
-      <a-cone position="-.54 .55 -.4" rotation="-60 15 0" color="#E80"
-        radius-bottom=".08" radius-top="0" height="1"></a-cone>
+  <a-entity id="drago" position="0 150 -10" color="#C00">
+    <a-sphere id="dragoHead" position="0 0 1.8" radius="1.8" color="#C00">
+      <a-cone position="0 0 1.8" rotation="90 0 0" color="#C00"
+        radius-bottom="1.65" radius-top=".6" height="2.2"></a-cone>
+      <a-sphere id="eyeLeft" position="1.6 .3 .6" rotation="0 -40 0" radius=".3" src="#cEye" draw-canvas="cEye"></a-sphere>
+      <a-sphere id="eyeRight" position="-1.6 .3 .6" rotation="0 40 180" radius=".3" src="#cEye" draw-canvas="cEye"></a-sphere>
+      <a-cone position="1.5 1.6 -1.2" rotation="-60 -17 0" color="#E80"
+        radius-bottom=".4" radius-top="0" height="3"></a-cone>
+      <a-cone position="-1.5 1.6 -1.2" rotation="-60 17 0" color="#E80"
+        radius-bottom=".4" radius-top="0" height="3"></a-cone>
     </a-sphere>
     <a-entity id="dragBody">
     </a-entity>
