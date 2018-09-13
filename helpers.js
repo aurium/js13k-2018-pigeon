@@ -13,6 +13,10 @@ const halfTurn = deg180;
 const quarterTurn = deg90;
 var g = {x:1, y:0, z:0};
 var fps = 30; // initialization only
+var alphaPingeon;
+var thePingeon;
+var thePingeonWasCatched = false;
+var armEndRealPos;
 
 const sin = Math.sin;
 const cos = Math.cos;

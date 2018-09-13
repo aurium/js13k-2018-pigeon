@@ -6,7 +6,6 @@
   "src": "index.html game.js plane.js boid.js drago.js balloon.js helpers.js",
   "zip": "/tmp/js13k-aurium-2018-pigeon.zip",
   "scripts": {
-    "env": "env",
     "build": "rm $npm_package_zip && zip $npm_package_zip $npm_package_src && ls -l $npm_package_zip"
   },
   "repository": {

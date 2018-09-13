@@ -1,6 +1,6 @@
 "use strict";
 
-var boids = [];
+var boids = window.boids = [];
 var pingeonCounter = 0;
 var boidsCenter;
 
@@ -65,6 +65,7 @@ function mkPingeon(x, y, z, color='#DDD') {
   me.rotation.order = 'ZYX';
   me.rotation.x = -deg90;
   me.rotation.y = deg45;
+  me.scale = 1;
   me.will = me.rotation.clone();
   me.nearest = null;
   me.speedMult = 1;
@@ -79,6 +80,7 @@ var maxDistCenter = 8;
 var minDist = .5;
 
 window.boidTic = function boidTic(ticCount) {
+  //console.log(thePingeon == boids[boids.length-1])
 
   if ((ticCount)%boidTicsCheckout == 0) {
     boidsCenter = new THREE.Vector3();
@@ -93,13 +95,14 @@ window.boidTic = function boidTic(ticCount) {
         b2.vecTo[b1.id] = b1.pos.clone().sub(b2.pos);
       }
       boidsCenter.add(b1.pos);
-      boidsCenter.add(thePingeon.pos); // Makes the center of mass near to the main pingeon.
+      //boidsCenter.add(alphaPingeon.pos); // Makes the center of mass near to the master.
 //      b1.debugLineToNear.array[3] = b1.vecTo[b1.nearest.id].x+.4;
 //      b1.debugLineToNear.array[4] = b1.vecTo[b1.nearest.id].y+.4;
 //      b1.debugLineToNear.array[5] = b1.vecTo[b1.nearest.id].z;
 //      b1.debugLineToNear.needsUpdate = true;
     }
-    xyzDo((k)=> boidsCenter[k] /= boids.length*2 );
+    //xyzDo((k)=> boidsCenter[k] /= boids.length*2);
+    xyzDo((k)=> boidsCenter[k] = ( (boidsCenter[k]/boids.length) + alphaPingeon.pos[k]*2) / 3 );
     //boidsCenterEl.object3D.position.copy(boidsCenter);
 
     for (var b,i=0; b=boids[i]; i++) {
@@ -173,12 +176,25 @@ window.boidTic = function boidTic(ticCount) {
 
   var speed = 7/fps;
   for (var b,i=0; b=boids[i]; i++) {
-    xyzDo((k)=> b.rotation[k] = (b.rotation[k]*9 + b.will[k]) / 10 );
-    var vecVel = (new THREE.Vector3(0,speed*b.speedMult,0)).applyEuler(b.rotation);
-    xyzDo((k)=> {
-      b.pos[k] += vecVel[k];
-      //b.debug.pos[k] = b.pos[k];
-    });
+    if (thePingeonWasCatched && b == thePingeon) {
+      if (thePingeon.scale > .12) {
+        thePingeon.scale -= .04;
+        if (thePingeon.scale < .12) thePingeon.scale = .12;
+        let s = thePingeon.scale;
+        thePingeon.setAttribute('scale', `${s} ${s} ${s}`);
+      }
+      xyzDo((k)=> {
+        if (abs(b.pos[k] - armEndRealPos[k]) < .5) b.pos[k] = armEndRealPos[k];
+        else b.pos[k] = (b.pos[k]*4 + armEndRealPos[k]) / 5;
+      });
+    } else {
+      xyzDo((k)=> b.rotation[k] = (b.rotation[k]*9 + b.will[k]) / 10 );
+      var vecVel = (new THREE.Vector3(0,speed*b.speedMult,0)).applyEuler(b.rotation);
+      xyzDo((k)=> {
+        b.pos[k] += vecVel[k];
+        //b.debug.pos[k] = b.pos[k];
+      });
+    }
   }
 }
 

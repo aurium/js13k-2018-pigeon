@@ -5,10 +5,21 @@
 var keyPressed = {};
 var x,y,z,i;
 
-setTimeout(()=> {
+window.start = function (counter=10) {
+  intro.style.display = 'none';
+  info.setAttribute('position', '2.4 0 -.5');
+  info.setAttribute('width', 5);
+  info.setAttribute('value', counter);
+  if (counter == 0) realStart();
+  else setTimeout(()=> start(--counter), 1000);
+};
+function realStart() {
   started = true;
   startTime = Date.now();
-}, 1000);
+  info.setAttribute('position', '.8 0 -.5');
+  info.setAttribute('width', 2);
+  info.setAttribute('value', '');
+}
 
 // Draw Sky pattern
 //(()=> {
@@ -83,7 +94,7 @@ setTimeout(()=> {
 
 // Create Pingeons
 for (i=0; i<30; i++) mkPingeon(rnd(10)+200, rnd(95,105), rnd(10)+500);
-var thePingeon = mkPingeon(205, 100, 500, '#D00');
+thePingeon = alphaPingeon = mkPingeon(205, 100, 500, '#D00');
 thePingeon.id = 'thePingeon';
 //window.boidsCenterEl = mk('sphere', {radius:.3, color:'blue'});
 

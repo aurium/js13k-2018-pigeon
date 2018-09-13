@@ -9,6 +9,21 @@ var planeSpeed = 1;
 
 plane.rotation = plane.object3D.rotation;
 plane.pos = plane.object3D.position;
+arm.pos = arm.object3D.position;
+armEnd.pos = armEnd.object3D.position;
+catcher.pos = catcher.object3D.position;
+setTimeout(()=> {
+  catcher.line = catcher.getObject3D('line').geometry.attributes.position;
+  catcher.lineMaterial = catcher.getObject3D('line').material;
+  catcher.lineMaterial.linewidth = 10;
+}, 10);
+
+function cpVecToLine(line, index, vec) {
+  line.array[index+0] = vec.x;
+  line.array[index+1] = vec.y;
+  line.array[index+2] = vec.z;
+  line.needsUpdate = true;
+}
 
 function getWay() {
   if (g.x > 10) g.x = 10; if (g.x < -10) g.x = -10;
@@ -52,6 +67,42 @@ window.planeTic = (ticCount)=> {
       scene.setAttribute('background', 'color', skyColor);
     }
   }
+  armEndRealPos = getRealPosition(armEnd);
+  var thePingeonDist = armEndRealPos.distanceTo(thePingeon.pos);
+  if (!thePingeonWasCatched) {
+    if (thePingeonDist > 80) {
+      if (arm.pos.y < +0.4) arm.pos.y += .01;
+      if (arm.pos.z < +0.0) arm.pos.z += .01;
+    } else {
+      if (arm.pos.y > -0.1) arm.pos.y -= .01;
+      if (arm.pos.z > -0.3) arm.pos.z -= .01;
+    }
+  } else {
+    // .15 -.1 -.3
+    if (arm.pos.x > +0.05) arm.pos.x -= .01;
+    if (arm.pos.y < +0.20) arm.pos.y += .01;
+    if (arm.pos.z < -0.10) arm.pos.z += .01;
+  }
+  var vecToPingeon = (new THREE.Vector3()).copy(thePingeon.pos).sub(armEndRealPos);
+  if (thePingeonDist > 2.5) {
+    vecToPingeon.normalize().multiplyScalar(.1);
+  }
+  else if (!thePingeonWasCatched) {
+    thePingeonWasCatched = true;
+    alphaPingeon = boids[0];
+    catcher.setAttribute('radius', .31);
+    //arm.pos.copy({x:.05, y:.2, z:-.1});
+    let totSecs = Math.round((Date.now()-startTime)/1000);
+    let secs = totSecs%60;
+    let minutes = (totSecs-secs)/60;
+    secs = secs.toString();
+    while (secs.length<2) secs = '0'+secs;
+    info.setAttribute('width', 2);
+    info.setAttribute('value', `You did it!\nin ${minutes}:${secs} minutes`);
+  }
+  catcher.pos.copy(vecToPingeon.clone().add(armEndRealPos));
+  cpVecToLine(catcher.line, 0, {x:0, y:0, z:0});
+  cpVecToLine(catcher.line, 3, vecToPingeon.negate());
   testColision();
 }
 
@@ -68,14 +119,19 @@ function testColision() {
   if (plane.pos.y < 0) return hit(ground);
 }
 
-function updateRealPosition(theEl) {
+function getRealPosition(theEl) {
   var curEl = theEl;
-  theEl.realPos = new THREE.Vector3();
+  var realPos = new THREE.Vector3();
   while (curEl != scene) {
-    theEl.realPos.applyEuler(curEl.object3D.rotation);
-    theEl.realPos.add(curEl.object3D.position);
+    realPos.applyEuler(curEl.object3D.rotation);
+    realPos.add(curEl.object3D.position);
     curEl = curEl.parentNode;
   }
+  return realPos;
+}
+
+function updateRealPosition(theEl) {
+  theEl.realPos = getRealPosition(theEl);
 }
 
 testColision.sphere = function(el) {
@@ -111,21 +167,12 @@ function hit(el) {
 
 function buildDeadPlane() {
   while (elice.firstElementChild) elice.firstElementChild.selfRemove();
-  //<a-sphere id="cabin" color="#F80" radius=".18" position="0 .2 0"></a-sphere>
   planeBody.mk('sphere', {position:'0 .2 -.11', radius:.18, color:'#F60'});
-  //<a-cone id="back" color="#F80" radius-bottom=".2" radius-top=".08" height="1"
-  //        position="0 .65 0" rotation="0 0 0"></a-cone>
   planeBody.mk('cone', {position:'0 .65 0', 'radius-bottom':.2, 'radius-top':.08, height:1, color:'#F80'});
-  //<a-cone id="wingLeft" color="#F80" radius-bottom=".2" radius-top=".1" height="1"
-  //        position="-.6 .3 .05" scale=".4 1 1" rotation="90 0 90"></a-cone>
   planeBody.mk('cone', {position:'-.6 .3 .05', scale:'.4 1 1', rotation:'90 0 90',
                'radius-bottom':.2, 'radius-top':.1, height:1, color:'#F60'});
-  //<a-cone id="wingRight" color="#F80" radius-bottom=".2" radius-top=".1" height="1"
-  //        position=".6 .3 .05" scale=".4 1 1" rotation="90 0 -90"></a-cone>
   planeBody.mk('cone', {position:'.6 .3 .05', scale:'.4 1 1', rotation:'90 0 -90',
                'radius-bottom':.2, 'radius-top':.1, height:1, color:'#F60'});
-  //<a-cone id="tail" color="#F80" radius-bottom=".15" radius-top=".05" height=".3"
-  //        position="0 1.06 -.2" scale=".2 1 1" rotation="-70 0 0"></a-cone>
   planeBody.mk('cone', {position:'0 1.06 -.2', scale:'.2 1 1', rotation:'-70 0 0',
                'radius-bottom':.15, 'radius-top':.05, height:.3, color:'#F60'});
 }
@@ -145,13 +192,16 @@ function showDeath() {
       explosionRadius = 3;
       explosion2.selfRemove();
       explosion1.selfRemove();
-      doSmoke();
+      //doSmoke();
     }
   }
   // Turn a little asside:
   planeBody.object3D.rotation.y += -planeSpeed/5;
   // Drop if not in thr ground:
-  if (plane.pos.y > -.4) plane.pos.y -= 0.5;
+  if (plane.pos.y > -.4) {
+    plane.pos.y -= 0.5;
+    if (plane.pos.y < -.4) plane.pos.y = -.4;
+  }
   // Correct Cam Roll:
   cam.object3D.rotation.z /= 1.01;
   // Correct plane Pitch:
